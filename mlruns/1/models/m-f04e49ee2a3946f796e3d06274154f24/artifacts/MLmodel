@@ -1,0 +1,23 @@
+artifact_path: file:///C:/Users/devad/OneDrive/Desktop/Mini Project MLOPS/IntelliPredict-MLOps/mlruns/1/models/m-f04e49ee2a3946f796e3d06274154f24/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.11.9
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.9.0
+    skops_trusted_types: null
+mlflow_version: 3.16.0
+model_id: m-f04e49ee2a3946f796e3d06274154f24
+model_size_bytes: 334132
+model_uuid: m-f04e49ee2a3946f796e3d06274154f24
+prompts: null
+run_id: 9f57c988ed884a5e9f6b0236d89da734
+utc_time_created: '2026-09-16 14:13:00.581935'

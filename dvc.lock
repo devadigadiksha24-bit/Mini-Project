@@ -1,0 +1,42 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python src/data_preprocessing.py
+    deps:
+    - path: data/raw/WA_Fn-UseC_-Telco-Customer-Churn.csv
+      hash: md5
+      md5: 0f9de68e012bd3aed5fa7cdc9fc421af
+      size: 977501
+    - path: src/data_preprocessing.py
+      hash: md5
+      md5: 755ecef1bb49e51c311280146e15e3b7
+      size: 2104
+    outs:
+    - path: data/processed/churn_processed.csv
+      hash: md5
+      md5: 4c1ffd81b341a87166cd73d4baeb7eeb
+      size: 889148
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed/churn_processed.csv
+      hash: md5
+      md5: 4c1ffd81b341a87166cd73d4baeb7eeb
+      size: 889148
+    - path: src/train.py
+      hash: md5
+      md5: e4e8776367049fbbee965eb46f12e8c9
+      size: 14691
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: 2bea61ac2cf82a8abb49eb15a221723b
+      size: 1259
+    - path: model_comparison.csv
+      hash: md5
+      md5: 0d775c48137eca06bb30401042287fa2
+      size: 292
+    - path: models/best_model.pkl
+      hash: md5
+      md5: b230e828b0857957fbae4f1cb38200cf
+      size: 8474
