@@ -10,84 +10,42 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ==========================================
-# LOAD MODEL
-# ==========================================
-
 MODEL_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
     "models",
     "best_model.pkl"
 )
 
-if not os.path.exists(MODEL_PATH):
-    raise FileNotFoundError(
-        f"Model not found: {MODEL_PATH}. "
-        "Please run src/train.py first."
-    )
+if os.path.exists(MODEL_PATH):
+    model = joblib.load(MODEL_PATH)
+else:
+    model = None
 
-model = joblib.load(MODEL_PATH)
-
-
-# ==========================================
-# INPUT DATA MODEL
-# ==========================================
 
 class CustomerData(BaseModel):
-
     gender: str = "Female"
-
-    SeniorCitizen: int = Field(
-        default=0,
-        ge=0,
-        le=1
-    )
-
+    SeniorCitizen: int = Field(default=0, ge=0, le=1)
     Partner: str = "No"
     Dependents: str = "No"
-
-    tenure: int = Field(
-        default=12,
-        ge=0
-    )
-
+    tenure: int = Field(default=12, ge=0)
     PhoneService: str = "Yes"
     MultipleLines: str = "No"
-
     InternetService: str = "DSL"
-
     OnlineSecurity: str = "No"
     OnlineBackup: str = "No"
     DeviceProtection: str = "No"
     TechSupport: str = "No"
-
     StreamingTV: str = "No"
     StreamingMovies: str = "No"
-
     Contract: str = "Month-to-month"
-
     PaperlessBilling: str = "Yes"
-
     PaymentMethod: str = "Electronic check"
+    MonthlyCharges: float = Field(default=70.0, ge=0)
+    TotalCharges: float = Field(default=840.0, ge=0)
 
-    MonthlyCharges: float = Field(
-        default=70.0,
-        ge=0
-    )
-
-    TotalCharges: float = Field(
-        default=840.0,
-        ge=0
-    )
-
-
-# ==========================================
-# HOME ENDPOINT
-# ==========================================
 
 @app.get("/")
 def home():
-
     return {
         "project": "IntelliPredict MLOps",
         "service": "Customer Churn Prediction API",
@@ -95,27 +53,22 @@ def home():
     }
 
 
-# ==========================================
-# HEALTH CHECK
-# ==========================================
-
 @app.get("/health")
 def health():
-
     return {
         "status": "healthy",
-        "model_loaded": True
+        "model_loaded": model is not None
     }
 
 
-# ==========================================
-# PREDICTION ENDPOINT
-# ==========================================
-
 @app.post("/predict")
 def predict_churn(customer: CustomerData):
-
     try:
+        if model is None:
+            raise HTTPException(
+                status_code=503,
+                detail="Model is not available. Please train the model first."
+            )
 
         if hasattr(customer, "model_dump"):
             customer_dict = customer.model_dump()
@@ -125,7 +78,6 @@ def predict_churn(customer: CustomerData):
         input_data = pd.DataFrame([customer_dict])
 
         prediction = model.predict(input_data)[0]
-
         probability = model.predict_proba(input_data)[0][1]
 
         if probability >= 0.70:
@@ -143,8 +95,10 @@ def predict_churn(customer: CustomerData):
             "risk_level": risk_level
         }
 
-    except Exception as e:
+    except HTTPException:
+        raise
 
+    except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=str(e)

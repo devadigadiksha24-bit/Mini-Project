@@ -1,12 +1,19 @@
 from fastapi.testclient import TestClient
-from api.app import app
+import api.app as api_module
+
+client = TestClient(api_module.app)
 
 
-client = TestClient(app)
+class FakeModel:
+
+    def predict(self, data):
+        return [0]
+
+    def predict_proba(self, data):
+        return [[0.70, 0.30]]
 
 
 def test_home():
-
     response = client.get("/")
 
     assert response.status_code == 200
@@ -18,7 +25,6 @@ def test_home():
 
 
 def test_health():
-
     response = client.get("/health")
 
     assert response.status_code == 200
@@ -26,10 +32,16 @@ def test_health():
     data = response.json()
 
     assert data["status"] == "healthy"
-    assert data["model_loaded"] is True
+    assert "model_loaded" in data
 
 
-def test_prediction():
+def test_prediction(monkeypatch):
+
+    monkeypatch.setattr(
+        api_module,
+        "model",
+        FakeModel()
+    )
 
     customer = {
         "gender": "Female",
@@ -69,8 +81,11 @@ def test_prediction():
     assert "risk_level" in data
 
     assert data["prediction"] in [0, 1]
+
     assert 0 <= data["churn_probability"] <= 1
+
     assert 0 <= data["churn_percentage"] <= 100
+
     assert data["risk_level"] in [
         "Low",
         "Medium",
