@@ -12,6 +12,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      PYTHONPATH: .
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,6 +30,13 @@ jobs:
           pip install -r requirements.txt
           pip install pytest httpx
 
+      - name: Check project structure
+        run: |
+          pwd
+          ls
+          ls api
+          ls tests
+
       - name: Run tests
         run: |
-          pytest -v
+          python -m pytest -v
