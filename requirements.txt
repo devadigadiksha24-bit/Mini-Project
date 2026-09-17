@@ -6,3 +6,9 @@ scikit-learn
 xgboost
 joblib
 pydantic
+streamlit
+requests
+mlflow
+dvc
+pytest
+httpx
