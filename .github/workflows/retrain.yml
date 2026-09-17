@@ -26,10 +26,10 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-  run: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-    pip install mlflow
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install mlflow
 
       - name: Install DVC
         run: |
