@@ -25,16 +25,26 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Verify requirements
+        run: |
+          echo "===== requirements.txt ====="
+          cat requirements.txt
+          echo "===== Checking MLflow ====="
+          grep -i "^mlflow" requirements.txt
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python -m pip install mlflow
-          python -c "import mlflow; print('MLflow version:', mlflow.__version__)"
+
+      - name: Verify MLflow installation
+        run: |
+          python -c "import mlflow; print('MLflow installed successfully:', mlflow.__version__)"
 
       - name: Install DVC
         run: |
-          pip install dvc
+          python -m pip install dvc
 
       - name: Run DVC pipeline
         run: |
